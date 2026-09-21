@@ -96,6 +96,57 @@ st.info("💡 **이 그래프로 알 수 있는 것:** (여기에 이 그래프�
 st.divider()
 
 # ====================================================================
-# 구역 3. (다음 그래프를 위한 자리)
+# 구역 3. 날짜별 10위권 일관객 합계 (영역 그래프)
 # ====================================================================
-# st.header("구역 3. ...")
+st.header("구역 3. 날짜별 10위권 일관객 합계")
+
+daily_total_df = (
+    df.groupby("날짜")["일관객"].sum().reset_index().sort_values("날짜")
+)
+daily_total_df.columns = ["날짜", "합계관객"]
+
+fig3 = px.area(
+    daily_total_df,
+    x="날짜",
+    y="합계관객",
+    title="날짜별 박스오피스 10위권 일관객 합계",
+    labels={"날짜": "날짜", "합계관객": "일일 합계 관객수"},
+)
+fig3.update_traces(
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>합계 관객수: %{y:,}명<extra></extra>"
+)
+
+# 합계가 가장 컸던 상위 3일 찾기
+top3_days = daily_total_df.sort_values("합계관객", ascending=False).head(3)
+
+for _, row in top3_days.iterrows():
+    fig3.add_annotation(
+        x=row["날짜"],
+        y=row["합계관객"],
+        text=row["날짜"].strftime("%Y-%m-%d"),
+        showarrow=True,
+        arrowhead=2,
+        yshift=10,
+        font=dict(color="crimson", size=12),
+        bgcolor="white",
+    )
+    fig3.add_scatter(
+        x=[row["날짜"]],
+        y=[row["합계관객"]],
+        mode="markers",
+        marker=dict(color="crimson", size=10, symbol="star"),
+        name="합계 최고 TOP3",
+        showlegend=False,
+        hovertemplate="날짜: %{x|%Y-%m-%d}<br>합계 관객수: %{y:,}명<extra>TOP3</extra>",
+    )
+
+st.plotly_chart(fig3, use_container_width=True)
+
+st.info("💡 **이 그래프로 알 수 있는 것:** (여기에 이 그래프로 알 수 있는 내용을 한 문장으로 적어주세요.)")
+
+st.divider()
+
+# ====================================================================
+# 구역 4. (다음 그래프를 위한 자리)
+# ====================================================================
+# st.header("구역 4. ...")
